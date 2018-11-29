@@ -1,46 +1,99 @@
-#include <ESP8266WiFi.h>
-#include <ws2812_i2s.h>
+// Party Cat v4 Test
+// This example will cycle through R, G, B, and W on all pixels.
 
-#define RED_LED_PIN 16
-#define WHITE_PIN 14
+#include <NeoPixelBus.h>
 
-#define PWM_RANGE_FULL (1024)
-#define RGB_RANGE_FULL (256)
+const uint16_t PixelCount = 2;
+const uint8_t PixelPin = 3;  // Esp8266 i2s DMA pin
 
-#define NUM_LEDS 10
-static WS2812 ledstrip;
+#define colorSaturation 255
 
-void setup() {
-  analogWriteRange(PWM_RANGE_FULL);
-  pinMode(WHITE_PIN, OUTPUT);
-  digitalWrite(WHITE_PIN, LOW);
+// four element pixels, GRBW
+NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> strip(PixelCount, PixelPin);
 
-  pinMode(RED_LED_PIN, OUTPUT);
-  digitalWrite(RED_LED_PIN, LOW);
+// three element pixels, in different order
+//NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PixelCount, PixelPin);
+//NeoPixelBus<NeoRgbFeature, Neo800KbpsMethod> strip(PixelCount, PixelPin);
 
-  Serial.begin(115200);
 
-  ledstrip.init(NUM_LEDS);
+RgbwColor red(colorSaturation, 0, 0, 0);
+RgbwColor green(0, colorSaturation, 0, 0);
+RgbwColor blue(0, 0, colorSaturation, 0);
+RgbwColor white(0, 0, 0, colorSaturation);
+RgbwColor black(0);
+
+
+void setup()
+{
+    Serial.begin(115200);
+    Serial.println();
+    Serial.println("Initializing...");
+    Serial.flush();
+
+    // this resets all the neopixels to an off state
+    strip.Begin();
+    strip.Show();
+
+    Serial.println("Running...");
 }
 
-void loop() {
-  // Alternate status LED on/off
-  digitalWrite(RED_LED_PIN, !digitalRead(RED_LED_PIN));
 
-  // Set the white PWM channel to a random brightness
-  analogWrite(WHITE_PIN, random(RGB_RANGE_FULL));
+void loop()
+{
+    Serial.println("red");
+    for (int i=0; i<PixelCount; i++) {
+      strip.SetPixelColor(i, red);
+    }
+    strip.Show();
+    delay(1000);
 
-  // Set up each WS2812 pixel to a random colour
-  Pixel_t pixels[NUM_LEDS];
-  for(int i=0; i<NUM_LEDS; i++) {
-    pixels[i].R = random(256);
-    pixels[i].G = random(256);
-    pixels[i].B = random(256);
-  }
+    Serial.println("off");
+    for (int i=0; i<PixelCount; i++) {
+      strip.SetPixelColor(i, black);
+    }
+    strip.Show();
+    delay(1000);
 
-  // Flush the new pixel data down the string
-  ledstrip.show(pixels);
+    Serial.println("green");
+    for (int i=0; i<PixelCount; i++) {
+      strip.SetPixelColor(i, green);
+    }
+    strip.Show();
+    delay(1000);
 
-  // Wait one second
-  delay(1000);
+    Serial.println("off");
+    for (int i=0; i<PixelCount; i++) {
+      strip.SetPixelColor(i, black);
+    }
+    strip.Show();
+    delay(1000);
+
+    Serial.println("blue");
+    for (int i=0; i<PixelCount; i++) {
+      strip.SetPixelColor(i, blue);
+    }
+    strip.Show();
+    delay(1000);
+
+    Serial.println("off");
+    for (int i=0; i<PixelCount; i++) {
+      strip.SetPixelColor(i, black);
+    }
+    strip.Show();
+    delay(1000);
+
+    Serial.println("white");
+    for (int i=0; i<PixelCount; i++) {
+      strip.SetPixelColor(i, white);
+    }
+    strip.Show();
+    delay(1000);
+
+    Serial.println("off");
+    for (int i=0; i<PixelCount; i++) {
+      strip.SetPixelColor(i, black);
+    }
+    strip.Show();
+    delay(1000);
+    
 }
